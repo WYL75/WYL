@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的空间</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #f4f5f7; font-family: -apple-system, sans-serif; color: #333; }
+.header { background: linear-gradient(135deg, #4e9af1, #7c4dff); padding: 30px 16px 60px; text-align: center; }
+.avatar { width: 80px; height: 80px; border-radius: 50%; border: 3px solid white; margin-bottom: 10px; background: #fff; }
+.nickname { color: white; font-size: 20px; font-weight: bold; }
+.bio { color: rgba(255,255,255,0.8); font-size: 13px; margin-top: 6px; }
+.main { max-width: 600px; margin: -30px auto 0; padding: 0 12px 40px; }
+.post-box { background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.post-input { width: 100%; border: none; outline: none; font-size: 15px; resize: none; min-height: 80px; color: #333; }
+.post-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+.btn { background: #4e9af1; color: white; border: none; padding: 8px 20px; border-radius: 20px; font-size: 14px; cursor: pointer; }
+.btn:active { opacity: 0.8; }
+.password-input { border: 1px solid #eee; border-radius: 8px; padding: 6px 10px; font-size: 13px; width: 120px; }
+.feed { margin-top: 12px; }
+.post-card { background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.post-content { font-size: 15px; line-height: 1.6; margin-bottom: 10px; }
+.post-images { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 10px; }
+.post-images img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; }
+.post-time { font-size: 12px; color: #999; margin-bottom: 10px; }
+.post-footer { display: flex; gap: 16px; border-top: 1px solid #f0f0f0; padding-top: 10px; }
+.action-btn { background: none; border: none; color: #999; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+.action-btn.liked { color: #f06292; }
+.comments { margin-top: 10px; background: #f9f9f9; border-radius: 10px; padding: 10px; }
+.comment-item { font-size: 13px; margin-bottom: 6px; line-height: 1.5; }
+.comment-name { color: #4e9af1; font-weight: bold; }
+.comment-form { display: flex; gap: 8px; margin-top: 8px; }
+.comment-input { flex: 1; border: 1px solid #eee; border-radius: 16px; padding: 6px 12px; font-size: 13px; outline: none; }
+.comment-submit { background: #4e9af1; color: white; border: none; border-radius: 16px; padding: 6px 14px; font-size: 13px; cursor: pointer; }
+.loading { text-align: center; color: #999; padding: 20px; font-size: 14px; }
+.image-preview { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.image-preview img { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <img class="avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=myspace" />
+  <div class="nickname">我的空间</div>
+  <div class="bio">记录生活的每一刻 ✨</div>
+</div>
+<div class="main">
+  <div class="post-box">
+    <textarea class="post-input" id="postContent" placeholder="说点什么吧..."></textarea>
+    <div id="imagePreview" class="image-preview"></div>
+    <div class="post-actions">
+      <input class="password-input" type="password" id="postPassword" placeholder="管理密码" />
+      <div style="display:flex;gap:8px">
+        <button class="btn" style="background:#f0f0f0;color:#666" onclick="document.getElementById('imageInput').click()">📷 图片</button>
+        <input type="file" id="imageInput" accept="image/*" multiple style="display:none" onchange="previewImages(event)">
+        <button class="btn" onclick="submitPost()">发布</button>
+      </div>
+    </div>
+  </div>
+  <div class="feed" id="feed">
+    <div class="loading">加载中...</div>
+  </div>
+</div><script>
+const SUPABASE_URL = 'https://cwrsdmchxkumoszxiokl.supabase.co/rest/v1/';
+const SUPABASE_KEY = 'sb_publishable_8wS7XepAAiQJ1W_crZuCyw_t0v00VWf';
+const ADMIN_PASSWORD = 'wyl520';
+
+let selectedImages = [];
+
+async function api(path, options = {}) {
+  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+    ...options,
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation',
+      ...options.headers
+    }
+  });
+  return res.json();
+}
+
+function timeAgo(dateStr) {
+  const diff = (Date.now() - new Date(dateStr)) / 1000;
+  if (diff < 60) return '刚刚';
+  if (diff < 3600) return Math.floor(diff/60) + '分钟前';
+  if (diff < 86400) return Math.floor(diff/3600) + '小时前';
+  return Math.floor(diff/86400) + '天前';
+}
+
+function previewImages(event) {
+  selectedImages = Array.from(event.target.files);
+  const preview = document.getElementById('imagePreview');
+  preview.innerHTML = '';
+  selectedImages.forEach(file => {
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    preview.appendChild(img);
+  });
+}
+
+async function uploadImage(file) {
+  const base64 = await new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.readAsDataURL(file);
+  });
+  return base64;
+}
+
+async function submitPost() {
+  const content = document.getElementById('postContent').value.trim();
+  const password = document.getElementById('postPassword').value;
+  if (password !== ADMIN_PASSWORD) return alert('密码错误！');
+  if (!content && selectedImages.length === 0) return alert('请输入内容！');
+  
+  let images = [];
+  for (const file of selectedImages) {
+    const base64 = await uploadImage(file);
+    images.push(base64);
+  }
+  
+  await api('posts', {
+    method: 'POST',
+    body: JSON.stringify({ content, images })
+  });
+  
+  document.getElementById('postContent').value = '';
+  document.getElementById('imagePreview').innerHTML = '';
+  selectedImages = [];
+  loadPosts();
+}
+
+async function toggleLike(postId, btn) {
+  await api('likes', {
+    method: 'POST',
+    body: JSON.stringify({ post_id: postId })
+  });
+  btn.classList.toggle('liked');
+  const count = parseInt(btn.dataset.count || 0) + 1;
+  btn.dataset.count = count;
+  btn.innerHTML = '❤️ ' + count;
+}
+
+async function submitComment(postId) {
+  const input = document.getElementById('comment-input-' + postId);
+  const nameInput = document.getElementById('comment-name-' + postId);
+  const content = input.value.trim();
+  const nickname = nameInput.value.trim() || '匿名';
+  if (!content) return;
+  
+  await api('comments', {
+    method: 'POST',
+    body: JSON.stringify({ post_id: postId, nickname, content })
+  });
+  input.value = '';
+  loadComments(postId);
+}
+
+async function loadComments(postId) {
+  const comments = await api('comments?post_id=eq.' + postId + '&order=created_at.asc');
+  const el = document.getElementById('comments-' + postId);
+  el.innerHTML = comments.map(c => `
+    <div class="comment-item">
+      <span class="comment-name">${c.nickname}：</span>${c.content}
+    </div>
+  `).join('');
+}
+
+async function loadPosts() {
+  const feed = document.getElementById('feed');
+  const posts = await api('posts?order=created_at.desc');
+  if (!posts.length) {
+    feed.innerHTML = '<div class="loading">还没有内容，快来发第一条吧！</div>';
+    return;
+  }
+  
+  feed.innerHTML = posts.map(post => `
+    <div class="post-card">
+      <div class="post-content">${post.content}</div>
+      ${post.images && post.images.length ? `<div class="post-images">${post.images.map(img => `<img src="${img}" onclick="window.open(this.src)">`).join('')}</div>` : ''}
+      <div class="post-time">${timeAgo(post.created_at)}</div>
+      <div class="post-footer">
+        <button class="action-btn" data-count="0" onclick="toggleLike(${post.id}, this)">❤️ 赞</button>
+        <button class="action-btn" onclick="document.getElementById('comment-box-${post.id}').style.display='block'">💬 评论</button>
+      </div>
+      <div class="comments">
+        <div id="comments-${post.id}"></div>
+        <div id="comment-box-${post.id}" style="display:none">
+          <div class="comment-form">
+            <input class="comment-input" id="comment-name-${post.id}" placeholder="你的昵称" style="width:80px">
+            <input class="comment-input" id="comment-input-${post.id}" placeholder="说点什么...">
+            <button class="comment-submit" onclick="submitComment(${post.id})">发</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  
+  posts.forEach(post => loadComments(post.id));
+}
+
+loadPosts();
+</script>
+</body>
+</html>
