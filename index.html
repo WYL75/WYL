@@ -331,6 +331,7 @@ async function uploadImage(file) {
 
 async function submitPost() {
   const content = document.getElementById('postContent').value.trim();
+alert('用户ID：' + currentUser?.user?.id + ' token：' + currentUser?.access_token?.substring(0,20));
   if (!content && selectedImages.length === 0) return alert('请输入内容');
   try {
     let images = [];
