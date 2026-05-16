@@ -185,7 +185,7 @@ function showErr(msg) {
 
 async function api(path, options = {}) {
   const token = currentUser ? currentUser.access_token : SUPABASE_KEY;
-  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+  const res = await fetch('https://cwrsdmchxkumoszxiokl.supabase.co/auth/v1/token?grant_type=password', {
     ...options,
     headers: {
       'apikey': SUPABASE_KEY,
@@ -264,7 +264,7 @@ async function login() {
     body: JSON.stringify({ email, password })
   });
   const data = await res.json();
-  if (!res.ok || data.error) return showErr('用户名或密码错误：' + (data.error_description || ''));
+  if (!res.ok || data.error) return showErr('错误：' + JSON.stringify(data));
   currentUser = data;
   saveSession();
   await initApp();
