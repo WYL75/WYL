@@ -332,16 +332,28 @@ async function uploadImage(file) {
 async function submitPost() {
   const content = document.getElementById('postContent').value.trim();
   if (!content && selectedImages.length === 0) return alert('请输入内容');
-  let images = [];
-  for (const file of selectedImages) images.push(await uploadImage(file));
-  await api('posts', {
-    method: 'POST',
-    body: JSON.stringify({ content, images, user_id: currentUser.user.id })
-  });
-  document.getElementById('postContent').value = '';
-  document.getElementById('imagePreview').innerHTML = '';
-  selectedImages = [];
-  loadFeed();
+  try {
+    let images = [];
+    for (const file of selectedImages) images.push(await uploadImage(file));
+    const res = await fetch(SUPABASE_URL + '/rest/v1/posts', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + currentUser.access_token,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      },
+      body: JSON.stringify({ content, images, user_id: currentUser.user.id })
+    });
+    const data = await res.json();
+    if (!res.ok) return alert('发布失败：' + JSON.stringify(data));
+    document.getElementById('postContent').value = '';
+    document.getElementById('imagePreview').innerHTML = '';
+    selectedImages = [];
+    loadFeed();
+  } catch(e) {
+    alert('发布出错：' + e.message);
+  }
 }
 
 async function toggleLike(postId, btn) {
