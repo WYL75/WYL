@@ -254,9 +254,17 @@ async function login() {
   const username = document.getElementById('loginUsername').value.trim();
   const password = document.getElementById('loginPassword').value;
   if (!username || !password) return showErr('请填写用户名和密码');
-  const email = toEmail(username);
-  const data = await authApi('token?grant_type=password', { email, password });
-  if (data.error) return showErr('用户名或密码错误');
+  const email = username.toLowerCase() + '@myspace.com';
+  const res = await fetch(SUPABASE_URL + '/auth/v1/token?grant_type=password', {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ email, password })
+  });
+  const data = await res.json();
+  if (!res.ok || data.error) return showErr('用户名或密码错误：' + (data.error_description || ''));
   currentUser = data;
   saveSession();
   await initApp();
