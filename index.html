@@ -441,7 +441,7 @@ function renderPosts(posts, containerId) {
 async function loadFeed() {
   document.getElementById('feed').innerHTML = '<div class="loading">加载中...</div>';
   try {
-    const posts = await api('posts?order=created_at.desc&select=*,profiles(nickname,avatar),likes(id)');
+    const posts = await api('posts?order=created_at.desc&select=*,profiles(nickname,avatar)');
     renderPosts(posts, 'feed');
   } catch(e) {
     document.getElementById('feed').innerHTML = '<div class="empty">加载失败：' + e.message + '</div>';
