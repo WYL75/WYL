@@ -347,7 +347,8 @@ alert('用户ID：' + currentUser?.user?.id + ' token：' + currentUser?.access_
       body: JSON.stringify({ content, images, user_id: currentUser.user.id })
     });
     const data = await res.json();
-    if (!res.ok) return alert('发布失败：' + JSON.stringify(data));
+    alert('状态：' + res.status + ' 返回：' + JSON.stringify(data));
+return;
     document.getElementById('postContent').value = '';
     document.getElementById('imagePreview').innerHTML = '';
     selectedImages = [];
