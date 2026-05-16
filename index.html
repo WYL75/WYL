@@ -331,7 +331,6 @@ async function uploadImage(file) {
 
 async function submitPost() {
   const content = document.getElementById('postContent').value.trim();
-alert('用户ID：' + currentUser?.user?.id + ' token：' + currentUser?.access_token?.substring(0,20));
   if (!content && selectedImages.length === 0) return alert('请输入内容');
   try {
     let images = [];
@@ -347,8 +346,7 @@ alert('用户ID：' + currentUser?.user?.id + ' token：' + currentUser?.access_
       body: JSON.stringify({ content, images, user_id: currentUser.user.id })
     });
     const data = await res.json();
-    alert('状态：' + res.status + ' 返回：' + JSON.stringify(data));
-return;
+    if (!res.ok) return alert('发布失败：' + JSON.stringify(data));
     document.getElementById('postContent').value = '';
     document.getElementById('imagePreview').innerHTML = '';
     selectedImages = [];
