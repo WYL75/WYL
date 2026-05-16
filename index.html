@@ -185,7 +185,19 @@ function showErr(msg) {
 
 async function api(path, options = {}) {
   const token = currentUser ? currentUser.access_token : SUPABASE_KEY;
-  const res = await fetch('https://cwrsdmchxkumoszxiokl.supabase.co/auth/v1/token?grant_type=password', {
+  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+    ...options,
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation',
+      ...options.headers
+    }
+  });
+  const text = await res.text();
+  return text ? JSON.parse(text) : [];
+}
     ...options,
     headers: {
       'apikey': SUPABASE_KEY,
