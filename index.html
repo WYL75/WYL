@@ -5,78 +5,221 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>我的空间</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: #f4f5f7; font-family: -apple-system, sans-serif; color: #333; }
-.header { background: linear-gradient(135deg, #4e9af1, #7c4dff); padding: 30px 16px 60px; text-align: center; }
-.avatar { width: 80px; height: 80px; border-radius: 50%; border: 3px solid white; margin-bottom: 10px; background: #fff; }
-.nickname { color: white; font-size: 20px; font-weight: bold; }
-.bio { color: rgba(255,255,255,0.8); font-size: 13px; margin-top: 6px; }
-.main { max-width: 600px; margin: -30px auto 0; padding: 0 12px 40px; }
-.post-box { background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-.post-input { width: 100%; border: none; outline: none; font-size: 15px; resize: none; min-height: 80px; color: #333; }
-.post-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
-.btn { background: #4e9af1; color: white; border: none; padding: 8px 20px; border-radius: 20px; font-size: 14px; cursor: pointer; }
-.btn:active { opacity: 0.8; }
-.password-input { border: 1px solid #eee; border-radius: 8px; padding: 6px 10px; font-size: 13px; width: 120px; }
-.feed { margin-top: 12px; }
-.post-card { background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-.post-content { font-size: 15px; line-height: 1.6; margin-bottom: 10px; }
-.post-images { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 10px; }
-.post-images img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; }
-.post-time { font-size: 12px; color: #999; margin-bottom: 10px; }
-.post-footer { display: flex; gap: 16px; border-top: 1px solid #f0f0f0; padding-top: 10px; }
-.action-btn { background: none; border: none; color: #999; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 4px; }
-.action-btn.liked { color: #f06292; }
-.comments { margin-top: 10px; background: #f9f9f9; border-radius: 10px; padding: 10px; }
-.comment-item { font-size: 13px; margin-bottom: 6px; line-height: 1.5; }
-.comment-name { color: #4e9af1; font-weight: bold; }
-.comment-form { display: flex; gap: 8px; margin-top: 8px; }
-.comment-input { flex: 1; border: 1px solid #eee; border-radius: 16px; padding: 6px 12px; font-size: 13px; outline: none; }
-.comment-submit { background: #4e9af1; color: white; border: none; border-radius: 16px; padding: 6px 14px; font-size: 13px; cursor: pointer; }
-.loading { text-align: center; color: #999; padding: 20px; font-size: 14px; }
-.image-preview { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.image-preview img { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#f4f5f7;font-family:-apple-system,sans-serif;color:#333;min-height:100vh}
+.page{display:none}
+.page.active{display:block}
+/* 顶部导航 */
+.topbar{background:linear-gradient(135deg,#4e9af1,#7c4dff);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.topbar-title{color:white;font-size:17px;font-weight:bold}
+.topbar-btn{color:white;background:none;border:none;font-size:14px;cursor:pointer;padding:4px 10px;border-radius:12px;background:rgba(255,255,255,0.2)}
+/* 底部导航 */
+.bottomnav{position:fixed;bottom:0;left:0;right:0;background:white;display:flex;border-top:1px solid #eee;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 0;cursor:pointer;color:#999;font-size:11px;gap:2px;border:none;background:none}
+.nav-item.active{color:#4e9af1}
+.nav-icon{font-size:22px}
+/* 登录注册页 */
+.auth-page{min-height:100vh;background:linear-gradient(135deg,#4e9af1,#7c4dff);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px}
+.auth-logo{font-size:48px;margin-bottom:10px}
+.auth-title{color:white;font-size:24px;font-weight:bold;margin-bottom:4px}
+.auth-sub{color:rgba(255,255,255,0.8);font-size:13px;margin-bottom:30px}
+.auth-box{background:white;border-radius:20px;padding:24px;width:100%;max-width:360px}
+.auth-tabs{display:flex;margin-bottom:20px;border-bottom:2px solid #f0f0f0}
+.auth-tab{flex:1;text-align:center;padding:8px;cursor:pointer;color:#999;font-size:15px;border-bottom:2px solid transparent;margin-bottom:-2px}
+.auth-tab.active{color:#4e9af1;border-bottom-color:#4e9af1;font-weight:bold}
+.auth-input{width:100%;border:1px solid #eee;border-radius:10px;padding:12px 14px;font-size:15px;margin-bottom:12px;outline:none}
+.auth-input:focus{border-color:#4e9af1}
+.auth-btn{width:100%;background:linear-gradient(135deg,#4e9af1,#7c4dff);color:white;border:none;border-radius:10px;padding:13px;font-size:16px;cursor:pointer;font-weight:bold}
+/* 个人主页 */
+.profile-header{position:relative;margin-bottom:60px}
+.profile-bg{width:100%;height:200px;object-fit:cover;background:linear-gradient(135deg,#4e9af1,#7c4dff);display:block}
+.profile-bg-default{width:100%;height:200px;background:linear-gradient(135deg,#4e9af1,#7c4dff)}
+.profile-avatar-wrap{position:absolute;bottom:-40px;left:50%;transform:translateX(-50%)}
+.profile-avatar{width:80px;height:80px;border-radius:50%;border:3px solid white;object-fit:cover;background:#eee;display:block}
+.profile-info{text-align:center;padding:50px 16px 16px}
+.profile-name{font-size:20px;font-weight:bold;margin-bottom:4px}
+.profile-bio{color:#999;font-size:13px;margin-bottom:12px}
+.profile-stats{display:flex;justify-content:center;gap:30px;margin-bottom:16px}
+.stat-item{text-align:center}
+.stat-num{font-size:18px;font-weight:bold;color:#333}
+.stat-label{font-size:12px;color:#999}
+.edit-btn{background:none;border:1px solid #4e9af1;color:#4e9af1;border-radius:20px;padding:6px 20px;font-size:13px;cursor:pointer}
+/* 说说 */
+.post-box{background:white;margin:0 12px 12px;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.post-box-top{display:flex;gap:10px;align-items:flex-start}
+.post-box-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;background:#eee;flex-shrink:0}
+.post-input{flex:1;border:none;outline:none;font-size:15px;resize:none;min-height:60px;color:#333;background:none}
+.post-actions{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid #f0f0f0}
+.btn{background:#4e9af1;color:white;border:none;padding:7px 18px;border-radius:20px;font-size:14px;cursor:pointer}
+.btn-ghost{background:none;border:1px solid #eee;color:#666;border-radius:20px;padding:6px 14px;font-size:13px;cursor:pointer}
+.feed{padding:0 12px 80px}
+.post-card{background:white;border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.post-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.post-avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;background:#eee}
+.post-meta{flex:1}
+.post-username{font-size:14px;font-weight:bold;color:#333}
+.post-time{font-size:12px;color:#999}
+.post-content{font-size:15px;line-height:1.6;margin-bottom:10px;word-break:break-all}
+.post-images{display:grid;gap:4px;margin-bottom:10px}
+.post-images.one img{width:100%;max-height:300px;object-fit:cover;border-radius:10px}
+.post-images.many{grid-template-columns:repeat(3,1fr)}
+.post-images.many img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px}
+.post-footer{display:flex;gap:16px;border-top:1px solid #f0f0f0;padding-top:10px}
+.action-btn{background:none;border:none;color:#999;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:4px;padding:4px 0}
+.action-btn.liked{color:#f06292}
+.comments-section{margin-top:10px;background:#f9f9f9;border-radius:10px;padding:10px}
+.comment-item{font-size:13px;margin-bottom:6px;line-height:1.5}
+.comment-name{color:#4e9af1;font-weight:bold}
+.comment-form{display:flex;gap:8px;margin-top:8px}
+.comment-input{flex:1;border:1px solid #eee;border-radius:16px;padding:6px 12px;font-size:13px;outline:none;background:white}
+.comment-submit{background:#4e9af1;color:white;border:none;border-radius:16px;padding:6px 14px;font-size:13px;cursor:pointer}
+.image-preview{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.image-preview img{width:70px;height:70px;object-fit:cover;border-radius:8px}
+.loading{text-align:center;color:#999;padding:30px;font-size:14px}
+.empty{text-align:center;color:#ccc;padding:40px;font-size:14px}
+/* 编辑资料弹窗 */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:flex-end}
+.modal.open{display:flex}
+.modal-box{background:white;border-radius:20px 20px 0 0;padding:24px;width:100%;max-height:80vh;overflow-y:auto}
+.modal-title{font-size:17px;font-weight:bold;margin-bottom:16px;text-align:center}
+.modal-input{width:100%;border:1px solid #eee;border-radius:10px;padding:11px 14px;font-size:15px;margin-bottom:12px;outline:none}
+.modal-input:focus{border-color:#4e9af1}
+.modal-btn{width:100%;background:linear-gradient(135deg,#4e9af1,#7c4dff);color:white;border:none;border-radius:10px;padding:13px;font-size:16px;cursor:pointer;font-weight:bold}
+.delete-btn{background:none;border:none;color:#ff4444;font-size:12px;cursor:pointer;margin-left:auto}
 </style>
 </head>
 <body>
-<div class="header">
-  <img class="avatar" src="https://wx4.sinaimg.cn/orj360/0079ZTGxly1icxrdaav0hj31o03m0b2b.jpg" />
-  <div class="nickname">我的空间</div>
-  <div class="bio">记录生活的每一刻 ✨</div>
+
+<!-- 登录注册页 -->
+<div id="authPage" class="auth-page">
+  <div class="auth-logo">🌟</div>
+  <div class="auth-title">我的空间</div>
+  <div class="auth-sub">记录生活，分享美好</div>
+  <div class="auth-box">
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="switchTab('login')">登录</div>
+      <div class="auth-tab" onclick="switchTab('register')">注册</div>
+    </div>
+    <div id="loginForm">
+      <input class="auth-input" id="loginEmail" type="email" placeholder="邮箱" />
+      <input class="auth-input" id="loginPassword" type="password" placeholder="密码" />
+      <button class="auth-btn" onclick="login()">登录</button>
+    </div>
+    <div id="registerForm" style="display:none">
+      <input class="auth-input" id="regNickname" placeholder="昵称" />
+      <input class="auth-input" id="regEmail" type="email" placeholder="邮箱" />
+      <input class="auth-input" id="regPassword" type="password" placeholder="密码（至少6位）" />
+      <button class="auth-btn" onclick="register()">注册</button>
+    </div>
+  </div>
 </div>
-<div class="main">
-  <div class="post-box">
-    <textarea class="post-input" id="postContent" placeholder="说点什么吧..."></textarea>
-    <div id="imagePreview" class="image-preview"></div>
-    <div class="post-actions">
-      <input class="password-input" type="password" id="postPassword" placeholder="管理密码" />
-      <div style="display:flex;gap:8px">
-        <button class="btn" style="background:#f0f0f0;color:#666" onclick="document.getElementById('imageInput').click()">📷 图片</button>
+
+<!-- 主应用 -->
+<div id="appPage" style="display:none;padding-bottom:60px">
+  <!-- 顶部栏 -->
+  <div class="topbar">
+    <div class="topbar-title" id="topbarTitle">动态</div>
+    <button class="topbar-btn" onclick="logout()">退出</button>
+  </div>
+
+  <!-- 动态页 -->
+  <div id="feedPage" class="page active">
+    <div style="height:12px"></div>
+    <div class="post-box">
+      <div class="post-box-top">
+        <img class="post-box-avatar" id="myAvatarSmall" src="" />
+        <textarea class="post-input" id="postContent" placeholder="说点什么吧..."></textarea>
+      </div>
+      <div id="imagePreview" class="image-preview"></div>
+      <div class="post-actions">
+        <button class="btn-ghost" onclick="document.getElementById('imageInput').click()">📷 图片</button>
         <input type="file" id="imageInput" accept="image/*" multiple style="display:none" onchange="previewImages(event)">
         <button class="btn" onclick="submitPost()">发布</button>
       </div>
     </div>
+    <div class="feed" id="feed">
+      <div class="loading">加载中...</div>
+    </div>
   </div>
-  <div class="feed" id="feed">
-    <div class="loading">加载中...</div>
+
+  <!-- 个人主页页 -->
+  <div id="profilePage" class="page">
+    <div class="profile-header">
+      <div class="profile-bg-default" id="profileBg"></div>
+      <div class="profile-avatar-wrap">
+        <img class="profile-avatar" id="profileAvatar" src="" />
+      </div>
+    </div>
+    <div class="profile-info">
+      <div class="profile-name" id="profileName">加载中...</div>
+      <div class="profile-bio" id="profileBio"></div>
+      <div class="profile-stats">
+        <div class="stat-item">
+          <div class="stat-num" id="postCount">0</div>
+          <div class="stat-label">说说</div>
+        </div>
+      </div>
+      <button class="edit-btn" onclick="openEditModal()">编辑资料</button>
+    </div>
+    <div class="feed" id="myFeed">
+      <div class="loading">加载中...</div>
+    </div>
+  </div>
+</div>
+
+<!-- 底部导航 -->
+<div class="bottomnav" id="bottomnav" style="display:none">
+  <button class="nav-item active" onclick="showPage('feed')" id="nav-feed">
+    <span class="nav-icon">🏠</span>
+    <span>动态</span>
+  </button>
+  <button class="nav-item" onclick="showPage('profile')" id="nav-profile">
+    <span class="nav-icon">👤</span>
+    <span>我的</span>
+  </button>
+</div>
+
+<!-- 编辑资料弹窗 -->
+<div class="modal" id="editModal">
+  <div class="modal-box">
+    <div class="modal-title">编辑资料</div>
+    <input class="modal-input" id="editNickname" placeholder="昵称" />
+    <input class="modal-input" id="editBio" placeholder="个人简介" />
+    <input class="modal-input" id="editAvatar" placeholder="头像图片链接（可选）" />
+    <button class="modal-btn" onclick="saveProfile()">保存</button>
+    <div style="height:10px"></div>
+    <button style="width:100%;background:none;border:none;color:#999;padding:10px;cursor:pointer" onclick="closeEditModal()">取消</button>
   </div>
 </div><script>
 const SUPABASE_URL = 'https://cwrsdmchxkumoszxiokl.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3cnNkbWNoeGt1bW9zenhpb2tsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NzY5MTMsImV4cCI6MjA5NDQ1MjkxM30.GZQtU5iMx0sxiVi_vnnx3-rPgF9q10J-6OiDzcDP-MM';
-const ADMIN_PASSWORD = 'wyl520';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3cnNkbWNoeGt1bW9zenhpb2tsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMDQxNzcsImV4cCI6MjA2Mjc4MDE3N30.GZQtU5iMx0sxiVi_vnnx3-rPgF9q10J-6OiDzcDP-MM';
 
+let currentUser = null;
+let currentProfile = null;
 let selectedImages = [];
 
 async function api(path, options = {}) {
-  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
-    ...options,
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=representation',
-      ...options.headers
-    }
+  const headers = {
+    'apikey': SUPABASE_KEY,
+    'Authorization': 'Bearer ' + (currentUser?.access_token || SUPABASE_KEY),
+    'Content-Type': 'application/json',
+    'Prefer': 'return=representation',
+    ...options.headers
+  };
+  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, { ...options, headers });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || '请求失败');
+  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : [];
+}
+
+async function authApi(path, body, method = 'POST') {
+  const res = await fetch(SUPABASE_URL + '/auth/v1/' + path, {
+    method,
+    headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
   });
   return res.json();
 }
@@ -84,9 +227,75 @@ async function api(path, options = {}) {
 function timeAgo(dateStr) {
   const diff = (Date.now() - new Date(dateStr + '+00:00')) / 1000;
   if (diff < 60) return '刚刚';
-  if (diff < 3600) return Math.floor(diff/60) + '分钟前';
-  if (diff < 86400) return Math.floor(diff/3600) + '小时前';
-  return Math.floor(diff/86400) + '天前';
+  if (diff < 3600) return Math.floor(diff / 60) + '分钟前';
+  if (diff < 86400) return Math.floor(diff / 3600) + '小时前';
+  return Math.floor(diff / 86400) + '天前';
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t, i) => t.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'register' && i === 1)));
+  document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+}
+
+async function register() {
+  const nickname = document.getElementById('regNickname').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+  if (!nickname || !email || !password) return alert('请填写完整信息');
+  const data = await authApi('signup', { email, password });
+  if (data.error) return alert(data.error.message || '注册失败');
+  currentUser = data;
+  await api('profiles', {
+    method: 'POST',
+    body: JSON.stringify({ id: data.user.id, nickname })
+  });
+  await initApp();
+}
+
+async function login() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  if (!email || !password) return alert('请填写邮箱和密码');
+  const data = await authApi('token?grant_type=password', { email, password });
+  if (data.error) return alert('邮箱或密码错误');
+  currentUser = data;
+  await initApp();
+}
+
+async function logout() {
+  currentUser = null;
+  currentProfile = null;
+  document.getElementById('authPage').style.display = 'flex';
+  document.getElementById('appPage').style.display = 'none';
+  document.getElementById('bottomnav').style.display = 'none';
+}
+
+async function initApp() {
+  document.getElementById('authPage').style.display = 'none';
+  document.getElementById('appPage').style.display = 'block';
+  document.getElementById('bottomnav').style.display = 'flex';
+  const profiles = await api('profiles?id=eq.' + currentUser.user.id);
+  currentProfile = profiles[0];
+  const avatar = currentProfile.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + currentProfile.nickname;
+  document.getElementById('myAvatarSmall').src = avatar;
+  loadFeed();
+}
+
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (page === 'feed') {
+    document.getElementById('feedPage').classList.add('active');
+    document.getElementById('nav-feed').classList.add('active');
+    document.getElementById('topbarTitle').textContent = '动态';
+    loadFeed();
+  } else {
+    document.getElementById('profilePage').classList.add('active');
+    document.getElementById('nav-profile').classList.add('active');
+    document.getElementById('topbarTitle').textContent = '我的空间';
+    loadProfile();
+  }
 }
 
 function previewImages(event) {
@@ -101,107 +310,166 @@ function previewImages(event) {
 }
 
 async function uploadImage(file) {
-  const base64 = await new Promise(resolve => {
+  return new Promise(resolve => {
     const reader = new FileReader();
     reader.onload = e => resolve(e.target.result);
     reader.readAsDataURL(file);
   });
-  return base64;
 }
 
 async function submitPost() {
   const content = document.getElementById('postContent').value.trim();
-  const password = document.getElementById('postPassword').value;
-  if (password !== ADMIN_PASSWORD) return alert('密码错误！');
-  if (!content && selectedImages.length === 0) return alert('请输入内容！');
-  
+  if (!content && selectedImages.length === 0) return alert('请输入内容');
   let images = [];
   for (const file of selectedImages) {
-    const base64 = await uploadImage(file);
-    images.push(base64);
+    images.push(await uploadImage(file));
   }
-  
   await api('posts', {
     method: 'POST',
-    body: JSON.stringify({ content, images })
+    body: JSON.stringify({ content, images, user_id: currentUser.user.id })
   });
-  
   document.getElementById('postContent').value = '';
   document.getElementById('imagePreview').innerHTML = '';
   selectedImages = [];
-  loadPosts();
+  loadFeed();
 }
 
 async function toggleLike(postId, btn) {
-  await api('likes', {
-    method: 'POST',
-    body: JSON.stringify({ post_id: postId })
-  });
-  btn.classList.toggle('liked');
-  const count = parseInt(btn.dataset.count || 0) + 1;
-  btn.dataset.count = count;
-  btn.innerHTML = '❤️ ' + count;
+  const liked = btn.classList.contains('liked');
+  if (liked) {
+    await api('likes?post_id=eq.' + postId + '&user_id=eq.' + currentUser.user.id, { method: 'DELETE' });
+    btn.classList.remove('liked');
+    btn.innerHTML = '❤️ ' + (parseInt(btn.dataset.count) - 1);
+    btn.dataset.count = parseInt(btn.dataset.count) - 1;
+  } else {
+    await api('likes', { method: 'POST', body: JSON.stringify({ post_id: postId, user_id: currentUser.user.id }) });
+    btn.classList.add('liked');
+    btn.innerHTML = '❤️ ' + (parseInt(btn.dataset.count) + 1);
+    btn.dataset.count = parseInt(btn.dataset.count) + 1;
+  }
 }
 
 async function submitComment(postId) {
-  const input = document.getElementById('comment-input-' + postId);
-  const nameInput = document.getElementById('comment-name-' + postId);
+  const input = document.getElementById('ci-' + postId);
   const content = input.value.trim();
-  const nickname = nameInput.value.trim() || '匿名';
   if (!content) return;
-  
-  await api('comments', {
-    method: 'POST',
-    body: JSON.stringify({ post_id: postId, nickname, content })
-  });
+  await api('comments', { method: 'POST', body: JSON.stringify({ post_id: postId, user_id: currentUser.user.id, content }) });
   input.value = '';
   loadComments(postId);
 }
 
-async function loadComments(postId) {
-  const comments = await api('comments?post_id=eq.' + postId + '&order=created_at.asc');
-  const el = document.getElementById('comments-' + postId);
-  el.innerHTML = comments.map(c => `
-    <div class="comment-item">
-      <span class="comment-name">${c.nickname}：</span>${c.content}
-    </div>
-  `).join('');
+async function deletePost(postId) {
+  if (!confirm('确定删除这条说说吗？')) return;
+  await api('posts?id=eq.' + postId, { method: 'DELETE' });
+  loadFeed();
+  loadProfile();
 }
 
-async function loadPosts() {
-  const feed = document.getElementById('feed');
-  const posts = await api('posts?order=created_at.desc');
+async function loadComments(postId) {
+  const comments = await api('comments?post_id=eq.' + postId + '&order=created_at.asc&select=*,profiles(nickname)');
+  const el = document.getElementById('comments-' + postId);
+  if (!el) return;
+  el.innerHTML = comments.map(c => `
+    <div class="comment-item">
+      <span class="comment-name">${c.profiles.nickname}：</span>${c.content}
+    </div>
+  `).join('') || '<div style="color:#ccc;font-size:12px">暂无评论</div>';
+}
+
+function renderPosts(posts, containerId) {
+
+
   if (!posts.length) {
-    feed.innerHTML = '<div class="loading">还没有内容，快来发第一条吧！</div>';
+    container.innerHTML = '<div class="empty">还没有内容，快来发第一条吧！</div>';
     return;
   }
-  
-  feed.innerHTML = posts.map(post => `
+  container.innerHTML = posts.map(post => {
+    const avatar = post.profiles.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + post.profiles.nickname;
+    const isOwner = currentUser && post.user_id === currentUser.user.id;
+    const imgCount = post.images ? post.images.length : 0;
+    return `
     <div class="post-card">
-      <div class="post-content">${post.content}</div>
-      ${post.images && post.images.length ? `<div class="post-images">${post.images.map(img => `<img src="${img}" onclick="window.open(this.src)">`).join('')}</div>` : ''}
-      <div class="post-time">${timeAgo(post.created_at)}</div>
-      <div class="post-footer">
-        <button class="action-btn" data-count="0" onclick="toggleLike(${post.id}, this)">❤️ 赞</button>
-        <button class="action-btn" onclick="document.getElementById('comment-box-${post.id}').style.display='block'">💬 评论</button>
+      <div class="post-header">
+        <img class="post-avatar" src="${avatar}" />
+        <div class="post-meta">
+          <div class="post-username">${post.profiles.nickname}</div>
+          <div class="post-time">${timeAgo(post.created_at)}</div>
+        </div>
+        ${isOwner ? `<button class="delete-btn" onclick="deletePost(${post.id})">删除</button>` : ''}
       </div>
-      <div class="comments">
+      <div class="post-content">${post.content}</div>
+      ${imgCount ? `<div class="post-images ${imgCount === 1 ? 'one' : 'many'}">${post.images.map(img => `<img src="${img}" onclick="window.open(this.src)">`).join('')}</div>` : ''}
+      <div class="post-footer">
+        <button class="action-btn" id="like-${post.id}" data-count="${post.likes ? post.likes.length : 0}" onclick="toggleLike(${post.id}, this)">❤️ ${post.likes ? post.likes.length : 0}</button>
+        <button class="action-btn" onclick="document.getElementById('cb-${post.id}').style.display='block'">💬 评论</button>
+      </div>
+      <div class="comments-section">
         <div id="comments-${post.id}"></div>
-        <div id="comment-box-${post.id}" style="display:none">
+        <div id="cb-${post.id}" style="display:none">
           <div class="comment-form">
-            <input class="comment-input" id="comment-name-${post.id}" placeholder="你的昵称" style="width:80px">
-            <input class="comment-input" id="comment-input-${post.id}" placeholder="说点什么...">
+            <input class="comment-input" id="ci-${post.id}" placeholder="说点什么..." />
             <button class="comment-submit" onclick="submitComment(${post.id})">发</button>
           </div>
         </div>
       </div>
-    </div>
-  `).join('');
-  
+    </div>`;
+  }).join('');
   posts.forEach(post => loadComments(post.id));
 }
 
-loadPosts();
+async function loadFeed() {
+  document.getElementById('feed').innerHTML = '<div class="loading">加载中...</div>';
+  const posts = await api('posts?order=created_at.desc&select=*,profiles(nickname,avatar),likes(id)');
+  renderPosts(posts, 'feed');
+}
+
+async function loadProfile() {
+  const avatar = currentProfile.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + currentProfile.nickname;
+  document.getElementById('profileAvatar').src = avatar;
+  document.getElementById('profileName').textContent = currentProfile.nickname;
+  document.getElementById('profileBio').textContent = currentProfile.bio || '这个人很懒，什么都没写';
+  document.getElementById('myFeed').innerHTML = '<div class="loading">加载中...</div>';
+  const posts = await api('posts?user_id=eq.' + currentUser.user.id + '&order=created_at.desc&select=*,profiles(nickname,avatar),likes(id)');
+  document.getElementById('postCount').textContent = posts.length;
+  renderPosts(posts, 'myFeed');
+}
+
+function openEditModal() {
+  document.getElementById('editNickname').value = currentProfile.nickname || '';
+  document.getElementById('editBio').value = currentProfile.bio || '';
+  document.getElementById('editAvatar').value = currentProfile.avatar || '';
+  document.getElementById('editModal').classList.add('open');
+}
+
+function closeEditModal() {
+  document.getElementById('editModal').classList.remove('open');
+}
+
+async function saveProfile() {
+  const nickname = document.getElementById('editNickname').value.trim();
+  const bio = document.getElementById('editBio').value.trim();
+  const avatar = document.getElementById('editAvatar').value.trim();
+  if (!nickname) return alert('昵称不能为空');
+  await api('profiles?id=eq.' + currentUser.user.id, {
+    method: 'PATCH',
+    headers: { 'Prefer': 'return=representation' },
+    body: JSON.stringify({ nickname, bio, avatar })
+  });
+  currentProfile = { ...currentProfile, nickname, bio, avatar };
+  closeEditModal();
+  loadProfile();
+}
+
+// 检查本地登录状态
+const saved = localStorage.getItem('sb_session');
+if (saved) {
+  try {
+    currentUser = JSON.parse(saved);
+    initApp();
+  } catch(e) {
+    localStorage.removeItem('sb_session');
+  }
+}
 </script>
 </body>
 </html>
